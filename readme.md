@@ -19,4 +19,4 @@ docker-compose run shuup python manage.py createsuperuser
 - Admin page (need an admin account): http://localhost/sa/
 ### What changes?
 - Change sqlite3 databasete to postgresql database, because there is an issue with sqlite3 when start the project.
-- Implement the Nignx to solve the issue with static files.
+- Implement the Nginx to solve the issue with static files.
