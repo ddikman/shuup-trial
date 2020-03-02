@@ -1,0 +1,56 @@
+version: '3'
+services:
+  nginx:
+    build:
+      context: ./
+      dockerfile: dockerfiles/nginx/nginx_local.dockerfile
+    ports:
+      - "80:80"
+    links:
+      - shuup
+    depends_on:
+      - shuup
+    volumes:
+      - ./demo_project:/demo_project/
+
+  shuup:
+    tty: true
+    stdin_open: true
+    build:
+      context: ./
+      dockerfile: dockerfiles/shuup/shuup.dockerfile
+    volumes:
+      - ./demo_project:/demo/
+    ports:
+      - "2000:2000"
+    links:
+      - db
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=shuup_demo
+      - DB_USER=styler
+      - DB_PASS=tW9FweeWSj
+    command: >
+      bash -c "
+      sleep 10
+      && python manage.py makemigrations
+      && python manage.py migrate
+      && python manage.py shuup_init
+      && python3 manage.py collectstatic --noinput
+      && python manage.py runserver 0.0.0.0:2000"
+    
+  db:
+    build:
+      context: ./dockerfiles/postgres/
+      dockerfile: postgres.dockerfile
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  
+
+
+
